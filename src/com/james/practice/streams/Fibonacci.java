@@ -4,25 +4,20 @@ import java.util.function.IntSupplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class Fibonacci
-{
-    private void runIterate()
-    {
+public class Fibonacci {
+    private void runIterate() {
         Stream.iterate(new int[]{0, 1}, n -> new int[]{n[1], n[0] + n[1]})
               .limit(20)
               .forEach(t -> System.out.println("(" + t[0] + ", " + t[1] + ")"));
     }
 
-    private void runGenerate()
-    {
-        IntSupplier intSupplier = new IntSupplier()
-        {
+    private void runGenerate() {
+        IntSupplier intSupplier = new IntSupplier() {
             private int prev = 0;
             private int curr = 1;
 
             @Override
-            public int getAsInt()
-            {
+            public int getAsInt() {
                 int oldPrev = prev;
                 int nextVal = prev + curr;
                 prev = curr;
@@ -36,8 +31,7 @@ public class Fibonacci
                  .forEach(System.out::println);
     }
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         Fibonacci fibonacci = new Fibonacci();
 
         System.out.println("runIterate");

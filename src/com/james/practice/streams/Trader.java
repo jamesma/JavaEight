@@ -1,32 +1,27 @@
 package com.james.practice.streams;
 
-public class Trader
-{
+public class Trader {
     private final String name;
     private final String city;
 
-    public Trader(String name, String city)
-    {
+    public Trader(String name, String city) {
         this.name = name;
         this.city = city;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getCity()
-    {
+    public String getCity() {
         return city;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "Trader{" +
-                "name='" + name + '\'' +
-                ", city='" + city + '\'' +
-                '}';
+            "name='" + name + '\'' +
+            ", city='" + city + '\'' +
+            '}';
     }
 }

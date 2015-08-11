@@ -8,59 +8,51 @@ import java.util.concurrent.Future;
 
 import static java.util.stream.Collectors.toList;
 
-public class Shop
-{
+public class Shop {
     private static final Random random = new Random();
 
     private final String name;
 
-    public Shop(String name)
-    {
+    public Shop(String name) {
         this.name = name;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    private double calculatePrice(String product)
-    {
+    private double calculatePrice(String product) {
         Delays.delay();
         return random.nextDouble() * product.charAt(0) + product.charAt(1);
     }
 
-    public double getPrice(String product)
-    {
+    public double getPrice(String product) {
         return calculatePrice(product);
     }
 
-    public Future<Double> getPriceAsync(String product)
-    {
+    public Future<Double> getPriceAsync(String product) {
         return CompletableFuture.supplyAsync(() -> calculatePrice(product));
     }
 
-    public List<String> findPrices(String product)
-    {
+    public List<String> findPrices(String product) {
         List<Shop> shops = Arrays.asList(new Shop("BestPrice"),
                                          new Shop("LetsSaveBig"),
                                          new Shop("MyFavoriteShop"),
                                          new Shop("BuyItAll"));
 
         List<CompletableFuture<String>> priceFutures =
-                shops.stream()
-                     .map(s ->
-                              CompletableFuture.supplyAsync(() -> s.getName() + " price is " + s.getPrice(product),
-                                                            Executors.EXECUTOR))
-                     .collect(toList());
+            shops.stream()
+                 .map(s ->
+                          CompletableFuture.supplyAsync(() -> s.getName() + " price is " + s.getPrice(product),
+                                                        Executors.EXECUTOR))
+                 .collect(toList());
 
         return priceFutures.stream()
                            .map(CompletableFuture::join)
                            .collect(toList());
     }
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         Shop shop = new Shop("BestShop");
         long start = System.nanoTime();
 
