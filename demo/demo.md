@@ -24,7 +24,7 @@ commonly referred to as functional-style programming.
 
 Java 8 *method reference* `::` syntax - means use this method as a value.
 
-```
+```java
 File[] hiddenFiles = new File(".").listFiles(new FileFilter() {
     public boolean accept(File file) {
         return file.isHidden();
@@ -53,7 +53,7 @@ concise for cases where you don't have a convenient method and class available.
 Programs using these concepts are said to be written in functional programming style - this phrase
 means "writing programs that pass functions around as first-class values".
 
-```
+```java
 public static List<Apple> filterGreenApples(List<Apple> inventory){
     List<Apple> result = new ArrayList<>();
     for (Apple apple: inventory){
@@ -68,7 +68,7 @@ public static List<Apple> filterGreenApples(List<Apple> inventory){
 But next, somebody would like the list of heavy apples (say over 150g), and so, with a heavy
 heart, you'd write the following method to achieve this (perhaps even using copy and paste):
 
-```
+```java
 public static List<Apple> filterHeavyApples(List<Apple> inventory){
     List<Apple> result = new ArrayList<>();
     for (Apple apple: inventory){
@@ -85,7 +85,7 @@ one variant but not the other), and hey, these two methods vary only in one line
 But as we mentioned, java 8 makes it possible to pass the code of the condition as an argument,
 thus avoiding code duplication of the filter method. you can now write this:
 
-```
+```java
 public static boolean isGreenApple(Apple apple) {
     return "green".equals(apple.getColor());
 }
@@ -112,7 +112,7 @@ public static List<Apple> filterApples(List<Apple> inventory,
 
 And to use this, you call either of the two below:
 
-```
+```java
 List<Apple> greenApples = filterApples(inventory, FilteringApples::isGreenApple);
 
 List<Apple> heavyApples = filterApples(inventory, FilteringApples::isHeavyApple);
@@ -122,7 +122,7 @@ Passing methods as values is clearly useful, but it's a bit annoying having a wr
 for short methods such as isHeavyApple and isGreenApple when they're used perhaps only once/twice
 Here's where you can use lambdas:
 
-```
+```java
 List<Apple> greenApples2 = filterApples(inventory, (Apple a) -> "green".equals(a.getColor()));
 
 List<Apple> heavyApples2 = filterApples(inventory, (Apple a) -> a.getWeight() > 150);
@@ -145,7 +145,7 @@ isn't always ideal. For e.g. let's say you need to filter expensive transactions
 then group them by currency. You'd need to write a lot of boilerplate code to implement this data
 processing query, as shown here:
 
-```
+```java
 Map<Currency, List<Transaction>> transactionsByCurrencies = new HashMap<>();
 for (Transaction transaction : transactions) {
     if (transaction.getPrice() > 1000) {
@@ -162,7 +162,7 @@ for (Transaction transaction : transactions) {
 
 Using the streams API, you can solve this problem as follows:
 
-```
+```java
 import static java.util.streams.Collectors.groupingBy;
 Map<Currency, List<Transaction>> transactionsByCurrencies =
     transactions.stream()
@@ -205,7 +205,7 @@ Key take-away:
 
 Here's a taste of how you can get "parallelism almost for free":
 
-```
+```java
 import static java.util.streams.Collectors.groupingBy;
 Map<Currency, List<Transaction>> transactionsByCurrencies =
     transactions.parallelStream() // s/stream/parallelStream/g
