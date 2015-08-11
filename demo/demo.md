@@ -212,3 +212,68 @@ Map<Currency, List<Transaction>> transactionsByCurrencies =
                 .filter((Transaction t) -> t.getPrice() > 1000)
                 .collect(groupingBy(Transaction::getCurrency));
 ```
+
+---
+
+Default methods
+===============
+
+Default methods are added to Java 8 largely to support library designers by enabling them to write
+*more evolvable* interfaces. They're important because you'll increasingly encounter them in
+interfaces, but because relatively few programmers will need to write default methods themselves
+and because they facilitate program evolution rather than helping write any particular program.
+
+For e.g. the previous Java 8 code has a problem:
+
+```java
+import static java.util.streams.Collectors.groupingBy;
+Map<Currency, List<Transaction>> transactionsByCurrencies =
+    transactions.parallelStream()
+                .filter((Transaction t) -> t.getPrice() > 1000)
+                .collect(groupingBy(Transaction::getCurrency));
+```
+
+`List<T>` prior to Java 8 doesn't have `stream` or `parallelStream` methods, and neither does the
+`Collection<T>` interface that it implements! Without these methods this code won't compile.
+
+The simplest solution which you might employ for your own interfaces, would have been for the Java 8
+designers to simply add the `stream` method to the `Collection` interface and add the implementation
+in the `ArrayList` class.
+
+But this would have been a nightmare for users. There are many alternative collection frameworks
+that implement interfaces from the Collections API. Adding a new method to an interface means all
+concrete classes must provide an implementation for it. Language designers have no control on all
+existing implementations of `Collections`, so you have a bit of a dilemma: how can you evolve
+published interfaces without disrupting existing implementations?
+
+Hence *default methods* for interfaces. An interface can now contain method signatures for which an
+implementing class doesn't provide an implementation! So who implements them? The missing method
+bodies are given as part of the interface rather than in the implementing class.
+
+Java 8 uses the keyword *default* in the *interface* specification to achieve this.
+
+For the above example, the following default method was added in the `List` interface, which
+calls the static method `Collections.sort`:
+
+```java
+default void sort(Comparator<? super E> c) {
+    Collections.sort(this, c);
+}
+```
+
+But wait, a single class can implement multiple interfaces, right? So does that mean that you can
+have multiple default implementations in several interfaces? The answer is Yes, to some extent.
+
+I'll talk about this later, there are some restrictions that prevent issues such as the
+infamous *diamond inheritance problem* in C++.
+
+---
+
+Other good ideas from functional programming
+============================================
+
+In Java 8 there's an `Optional<T>` class that, if used consistently, can help you avoid
+`NullPointerExceptions`. It's a container object that may or may not contain a value. `Optional<T>`
+also includes methods to explicitly deal with the case where a value is absent. In other words, it
+uses the type system to allow you to indicate when a variable is anticipated to potentially have a
+missing value.
