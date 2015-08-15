@@ -511,3 +511,158 @@ In general, the names of functional interfaces that have a specialization for th
 parameter are preceded by the appropriate primitive type, for example, `DoublePredicate`,
 `IntConsumer`, `IntFunction`, and so on. The `Function` has also variants for the output type
 parameter, such as `ToIntFunction<T>`, `IntToDoubleFunction`, and so on.
+
+What about exceptions?
+======================
+
+Note that none of the functional interfaces allow for a checked exception to be thrown. You have two
+options if you need a lambda expression to throw an exception:
+
+1. Define your own functional interface that declares the checked exception.
+2. Wrap the lambda with a try/catch block.
+
+Type Checking
+=============
+
+The type of a lambda is deduced from the context in which the lambda is used. The type expected for
+the lambda expression inside the context is called the *target type*. Let's look at an example to
+see what happens behind the scenes when you use a lambda expression:
+
+```java
+List<Apple> heavierThan150g = filter(inventory, (Apple a) -> a.getWeight() > 150);
+```
+
+1. You look up the declaration of the `filter` method
+2. It expects as the second formal parameter an object of type `Predicate<Apple>` (the target type)
+3. `Predicate<Apple>` is a functional interface defining a single abstract method called `test`
+4. The method `test` describes a function descriptor that accepts an `Apple` and returns a `boolean`
+
+Note that if the lambda expression were throwing an exception, then the declared `throws` clause of
+the abstract method would also have to match.
+
+You may have the same lambda, different functional interfaces because of the idea of target typing.
+
+Type Inference
+==============
+
+For lambda expressions up to this point, we can simplify them further. The Java compiler deduces
+what functional interface to associate with a lambda expression from its surrounding context. The
+compiler has access to the types of the parameters of a lambda expression and they can be omitted
+in the lambda syntax.
+
+```java
+// without type inference
+Comparator<Apple> c = (Apple a1, Apple a2) -> a1.getWeight().compareTo(a2.getWeight());
+
+// with type inference
+Comparator<Apple> c = (a1, a2) -> a1.getWeight().compareTo(a2.getWeight());
+```
+
+There's no rule for which way is better - developers must make their own choices.
+
+Using local variables
+=====================
+
+Lambda expressions are allowed to use *free variables* just like anonymous classes can - variables
+that aren't the parameters and defined in an outer scope. They're called *capturing lambdas*. Local
+variables have to be explicitly declared final or are effectively final.
+
+<!-- instance variables are stored on heap, local variables are stored on stack, if a lambda
+     could access the local variable directly and the lambda were used in a thread, then the thread
+     using the lambda could try to access the variable after the thread that allocated the variable
+     had de-allocated it. hence Java implements access to a free local variable as access to a copy
+     of it rather than access to the original. allowing capture of mutable local variables opens
+     new thread-unsafe opportunities, hence the restriction. -->
+
+Method References
+=================
+
+Why should you care about method references? Method references can be seen as a short hand for
+lambdas calling only a specific method. The basic idea is that if a lambda represents
+"call this method directly", it's best to refer to the method by name rather than by a description
+of how to call it. Through this your code can gain *better readability*.
+
+Lambda                                | Method reference equivalent
+------------------------------------- | ---------------------------
+`(Apple a) -> a.getWeight()`          | `Apple::getWeight`
+`(String s) -> System.out.println(s)` | `System.out::println`
+`(str, i) -> str.substring(i)`        | `String::substring`
+
+Q: What are equivalent method references for the following lambdas?
+```java
+1. Function<String, Integer> stringToInteger = (String s) -> Integer.parseInt(s);
+2. BiPredicate<List<String>, String> contains = (list, element) -> list.contains(element);
+```
+
+A:
+```java
+1. Function<String, Integer> stringToInteger = Integer::parseInt;
+2. BiPredicate<List<String>, String> contains = List::contains;
+```
+
+Putting lambdas and method references into practice!
+====================================================
+
+We'll try refactoring the problem of sorting a list of `Apples` with different ordering
+strategies and show how you can progressively evolve a naive solution into a concise one.
+
+Step 1:
+You already have `List.sort` method in Java 8, with the following signature:
+```java
+void sort(Comparator<? super E> c);
+```
+
+Your first solution looks like:
+```java
+public class AppleComparator implements Comparator<Apple> {
+    public int compare(Apple a1, Apple a2) {
+        return a1.getWeight().compareTo(a2.getWeight());
+    }
+}
+appleList.sort(new AppleComparator());
+```
+
+Step 2:
+Use an anonymous class.
+
+```java
+inventory.sort(new Comparator<Apple>(){
+    public int compare(Apple a1, Apple a2) {
+        return a1.getWeight().compareTo(a2.getWeight());
+    }
+});
+```
+
+Step 3:
+Use lambda expressions.
+
+```java
+inventory.sort((Apple a1, Apple a2) -> a1.getWeight().compareTo(a2.getWeight()));
+
+// with type inference
+inventory.sort((a1, a2) -> a1.getWeight().compareTo(a2.getWeight()));
+```
+
+`Comparator` has a static helper method called `comparing` that takes a `Function` extracting a
+`Comparable` key and produces a `Comparator` object.
+
+```java
+Comparator<Apple> c = Comparator.comparing((a) -> a.getWeight());
+```
+
+You can now rewrite your solution in a more compact form:
+```java
+import static java.util.Comparator.comparing;
+inventory.sort(comparing((a) -> a.getWeight()));
+```
+
+Step 4:
+Use method references:
+
+```java
+inventory.sort(comparing(Apple::getWeight));
+```
+
+Congratulations! This is your final solution! Why is this code better than code prior to Java 8?
+It's obvious what it means, and the code reads like the problem statement "sort inventory comparing
+the weight of the apples".
