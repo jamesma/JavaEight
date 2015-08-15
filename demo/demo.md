@@ -278,3 +278,236 @@ In Java 8 there's an `Optional<T>` class that, if used consistently, can help yo
 also includes methods to explicitly deal with the case where a value is absent. In other words, it
 uses the type system to allow you to indicate when a variable is anticipated to potentially have a
 missing value.
+
+Lambda Expressions
+==================
+
+A *lambda expression* can be understand as a concise representation of an anonymous function that
+can be passed around: it doesn't have a name, but it has a list of parameters, a body, a return
+type, and possibly a list of exceptions that can be thrown.
+
+Let's break it down:
+
+1. *Anonymous* - It doesn't have an explicit name like a method would normally have, less to write
+                 and think about!
+2. *Function* - We say *function* because a lambda isn't associated with a particular class like a
+                method is. But like a method, it has a list of parameters, a body, a return
+                type, and possibly a list of exceptions that can be thrown.
+3. *Passed around* - It can be passed as an argument to a method or stored in a variable.
+4. *Concise* - You don't need to write a lot of boilerplate like you do for anonymous classes.
+
+If you're wondering where the term *lambda* comes from, it originates from a system developed in
+academia called *lambda calculus*, which is used to describe computations.
+
+Before:
+```java
+Comparator<Apple> byWeight = new Comparator<Apple>() {
+    public int compare(Apple a1, Apple a2) {
+        return a1.getWeight().compareTo(a2.getWeight());
+    }
+}
+```
+
+After:
+```java
+Comparator<Apple> byWeight =
+    (Apple a1, Apple a2) -> a1.getWeight().compareTo(a2.getWeight);
+```
+
+<!-- show figure 3.1 -->
+
+The basic syntax of a lambda is either:
+```
+(parameters) -> expression
+```
+or
+```
+(parameters) -> { statements; }
+```
+
+To illustrate further, here's five examples of valid lambda expressions:
+```java
+(String s) -> s.length()
+
+(Apple a) -> a.getWeight() > 150
+
+(int x, int y) -> {
+    System.out.println("Result: ");
+    System.out.println(x + y);
+}
+
+() -> 42
+
+(Apple a1, Apple a2) -> a1.getWeight().compareTo(a2.getWeight())
+```
+
+Here's a list of example lambdas with examples of use cases:
+
+Use case                      | Examples of lambdas
+----------------------------- | -------------------
+A boolean expression          | `(List<String> list) -> list.isEmpty()`
+Creating objects              | `() -> new Apple(10)`
+Consuming from an object      | `(Apple a) -> { System.out.println(a.getWeight()); }`
+Select/extract from an object | `(String s) -> s.length()`
+Combine two values            | `(int a, int b) -> a * b`
+Compare two objects           | `(Apple a1, Apple a2) -> a1.getWeight().compareTo(a2.getWeight())`
+
+Where and how to use lambdas
+============================
+
+You can use a lambda expression in the context of a functional interface.
+
+In a nutshell, a *functional interface* is an interface that specifies exactly one abstract method.
+You already know several other functional interfaces in the Java API such as:
+
+```java
+public interface Comparator<T> { // java.util.Comparator
+    int compare(T o1, T o2);
+}
+
+public interface Runnable { // java.lang.Runnable
+    void run();
+}
+
+public interface ActionListener extends EventListener { // java.awt.event.ActionListener
+    void actionPerformed(ActionEvent e);
+}
+
+public interface Callable<V> { // java.util.concurrent.Callable
+    V call();
+}
+
+public interface PrivilegedAction<V> { // java.security.PrivilegedAction
+    T run();
+}
+```
+
+Note: An interface is still a functional interface if it has many default methods as long as it
+      specifies only one *abstract method*.
+
+Lambda expressions let you provide the implementation of the abstract method of a functional
+interface directly inline and *treat the whole expression as an instance of a functional interface*
+(more technically speaking, an instance of a *concrete implementation* of the functional interface).
+
+You can achieve the same thing with an anonymous inner class, although it's clumsier.
+
+Function descriptor
+===================
+
+The signature of the *abstract method* of the functional interface essentially describes the
+signature of the lambda expression. We call this abstract method a *function descriptor*.
+
+For example, the `Runnable` interface can be viewed as the signature of a function that accepts
+nothing (`void`) because it has only one abstract method called `run`, which accepts nothing and
+returns nothing (`void`).
+
+You may already be wondering how lambda expressions are type checked. We'll talk about this later.
+For now, it suffices to understand that a lambda expression can be assigned to a variable or
+passed to a method expecting a functional interface as argument, provided the lambda expression
+has the same signature as the abstract method of the functional interface.
+
+```java
+public interface Runnable { // java.lang.Runnable
+    void run(); // function descriptor: () -> void
+}
+
+class Demo {
+    private static void process(Runnable r) {
+        r.run();
+    }
+
+    public static void main(String[] args) {
+        // the following lambda expression has the same signature as the abstract method of Runnable
+        process(() -> System.out.println("Hello World!"));
+    }
+}
+```
+
+<!-- Might be also appropriate to mention @FunctionalInterface annotation -->
+
+The Java library designers have helped us by introducing several new functional interfaces inside
+the `java.util.function` package. Here's a few that are commonly used:
+
+```java
+// Accepts an object of generic type T and returns a boolean.
+@FunctionalInterface
+public interface Predicate<T> {
+    boolean test(T t);
+}
+
+// Accepts an object of generic type T and returns no result (void).
+@FunctionalInterface
+public interface Consumer<T> {
+    void accept(T t);
+}
+
+// Accepts an object of generic type T as input and returns an object of generic type R.
+@FunctionalInterface
+public interface Function<T, R> {
+    R apply(T t);
+}
+```
+
+Here's how you use a `Predicate`:
+```java
+public static <T> List<T> filter(List<T> list, Predicate<T> p) {
+    List<T> results = new ArrayList<>();
+    for (T s : list) {
+        if (p.test(s)) {
+            results.add(s);
+        }
+    }
+    return results;
+}
+
+// ["foo", "bar"]
+List<String> nonEmpty = filter(Arrays.asList("foo", "", "bar"),
+                               (String s) -> !s.isEmpty());
+```
+
+Here's how you use a `Consumer`:
+```java
+public static <T> void forEach(List<T> list, Consumer<T> c) {
+    for (T i : list) {
+        c.accept(i);
+    }
+}
+
+// 1, 2, 3
+forEach(Arrays.asList(1, 2, 3),
+        (Integer i) -> System.out.println(i));
+```
+
+Here's how you use a `Function`:
+```java
+public static <T, R> List<R> map(List<T> list, Function<T, R> f) {
+    List<R> result = new ArrayList<>();
+    for (T s : list) {
+        result.add(f.apply(s));
+    }
+    return result;
+}
+
+// [3, 3]
+List<Integer> ints = map(Array.asList("foo", "bar"),
+                         (String s) -> s.length());
+```
+
+Auto-boxing concerns
+====================
+
+What about auto-boxing? It comes with a performance cost after all. Java 8 brings a specialized
+version of the functional interfaces we described earlier in order to avoid autoboxing operations
+when the inputs or outputs are primitives.
+
+```java
+@FunctionalInterface
+public interface IntPredicate {
+    boolean test(int t);
+}
+```
+
+In general, the names of functional interfaces that have a specialization for the input type
+parameter are preceded by the appropriate primitive type, for example, `DoublePredicate`,
+`IntConsumer`, `IntFunction`, and so on. The `Function` has also variants for the output type
+parameter, such as `ToIntFunction<T>`, `IntToDoubleFunction`, and so on.
