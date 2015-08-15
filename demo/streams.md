@@ -76,7 +76,7 @@ operations". Let's break this down:
    from functional programming languages to manipulate data. Stream operations can be executed
    either sequentially or in parallel.
 
-In additiona, streams have two important characteristics:
+In addition, streams have two important characteristics:
 
 1. *pipelining* - many stream operations return a stream themselves, allowing operations to be
    chained and form a larger pipeline. This enables certain optimizations that we explain in detail
