@@ -44,6 +44,7 @@ public static List<String> getLowCaloricDishesNamesInJava8(List<Dish> dishes){
 
 For now, you can see that the new approach offers several immediate benefits from a software
 engineering point of view:
+
 1. The code is written in a *declarative way* - you specify *what* you want to achieve as opposed
    to specifying *how* to implement an operation (using control-flow blocks such as loops and if
    conditions).
