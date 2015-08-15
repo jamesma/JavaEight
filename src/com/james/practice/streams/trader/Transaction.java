@@ -1,4 +1,4 @@
-package com.james.practice.streams;
+package com.james.practice.streams.trader;
 
 public class Transaction {
     private final Trader trader;

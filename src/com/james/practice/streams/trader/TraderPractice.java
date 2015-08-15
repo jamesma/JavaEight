@@ -1,4 +1,4 @@
-package com.james.practice.streams;
+package com.james.practice.streams.trader;
 
 import java.util.Arrays;
 import java.util.List;
@@ -7,7 +7,7 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
-public class Practice {
+public class TraderPractice {
     Trader raoul = new Trader("Raoul", "Cambridge");
     Trader mario = new Trader("Mario", "Milan");
     Trader alan = new Trader("Alan", "Cambridge");
@@ -101,7 +101,7 @@ public class Practice {
     }
 
     public static void main(String[] args) {
-        Practice practice = new Practice();
-        practice.process();
+        TraderPractice traderPractice = new TraderPractice();
+        traderPractice.process();
     }
 }
