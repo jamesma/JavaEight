@@ -200,6 +200,7 @@ the second CPU to process the other half of the list. The CPUs then filter their
 half-lists. Finally, one CPU would join the two results.
 
 Key take-away:
+
 1. Collections API is mostly about storing and accessing data.
 2. Streams API is mostly about describing computations on data.
 
