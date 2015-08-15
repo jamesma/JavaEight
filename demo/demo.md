@@ -653,7 +653,7 @@ Comparator<Apple> c = Comparator.comparing((a) -> a.getWeight());
 You can now rewrite your solution in a more compact form:
 ```java
 import static java.util.Comparator.comparing;
-inventory.sort(comparing((a) -> a.getWeight()));
+inventory.sort(comparing(a -> a.getWeight()));
 ```
 
 **Step 4:**
@@ -666,3 +666,39 @@ inventory.sort(comparing(Apple::getWeight));
 Congratulations! This is your final solution! Why is this code better than code prior to Java 8?
 It's obvious what it means, and the code reads like the problem statement "sort inventory comparing
 the weight of the apples".
+
+What if requirements change?
+============================
+
+Reversed order (i.e. decreasing weight):
+```java
+inventory.sort(comparing(Apple::getWeight)
+         .reversed());                       // sorting by decreasing weight
+```
+
+Reversed order, and additional priority if two apples are of equal weight:
+```java
+inventory.sort(comparing(Apple::getWeight))
+         .reversed()                         // sorting by decreasing weight
+         .thenComparing(Apple::getCountry)); // sorting further by country when two apples have same weight
+```
+
+Composing Predicates
+====================
+
+The `Predicate` interface includes 3 methods that let you reuse an existing `Predicate` to create
+more complicated ones: `negate`, `and`, and `or`.
+
+```java
+Predicate<Apple> redApple = a -> "red".equals(a.getColor());
+
+Predicate<Apple> notRedApple = redApple.negate();
+
+Predicate<Apple> redAndHeavyApple = redApple.and(a -> a.getWeight > 150);
+
+Predicate<Apple> redAndHeavyAppleOrGreen = redApple.and(a -> a.getWeight > 150)
+                                                   .or(a -> "green".equals(a.getColor()));
+```
+
+Why is this great (again)? You can represent more complicated lambda expressions that still read
+like the problem statement!
