@@ -606,7 +606,7 @@ Putting lambdas and method references into practice!
 We'll try refactoring the problem of sorting a list of `Apples` with different ordering
 strategies and show how you can progressively evolve a naive solution into a concise one.
 
-Step 1:
+**Step 1:**
 You already have `List.sort` method in Java 8, with the following signature:
 ```java
 void sort(Comparator<? super E> c);
@@ -622,7 +622,7 @@ public class AppleComparator implements Comparator<Apple> {
 appleList.sort(new AppleComparator());
 ```
 
-Step 2:
+**Step 2:**
 Use an anonymous class.
 
 ```java
@@ -633,7 +633,7 @@ inventory.sort(new Comparator<Apple>(){
 });
 ```
 
-Step 3:
+**Step 3:**
 Use lambda expressions.
 
 ```java
@@ -656,7 +656,7 @@ import static java.util.Comparator.comparing;
 inventory.sort(comparing((a) -> a.getWeight()));
 ```
 
-Step 4:
+**Step 4:**
 Use method references:
 
 ```java
