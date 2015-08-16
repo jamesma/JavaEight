@@ -45,7 +45,7 @@ public class DishPractice {
     List<String> dishNamesUniqueCharacters() {
         return Dish.menu.stream()                   // Stream<Dish>
                         .map(Dish::getName)         // Stream<String>
-                        .map(w -> w.split(""))      // Stream<String[]
+                        .map(w -> w.split(""))      // Stream<String[]>
                         .flatMap(Arrays::stream)    // Stream<String>
                         .distinct()                 // Stream<String>
                         .collect(toList());         // List<String>
