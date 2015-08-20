@@ -1,6 +1,23 @@
 Introduction
 ============
 
+Topics covered today:
+
+1. Behavior parameterization
+2. Lambda expressions
+3. Method references
+4. Streams API (basic)
+5. Default methods
+
+Topics not yet covered:
+
+- Collecting data with streams
+- Parallel data processing and performance
+- Optional - a better alternative to null
+- CompletableFuture - composable async programming
+- New Date and Time API
+- Misc language and library updates
+
 Behavior Parameterization
 =========================
 
@@ -133,7 +150,7 @@ Fifth attempt
 
 Using anonymous classes:
 ```java
-List<Apple> redApples = filterApples(inventry, new ApplePredicate() {
+List<Apple> redApples = filterApples(inventory, new ApplePredicate() {
     public boolean test(Apple apple) {
         return "red".equals(apple.getColor());
     }
@@ -146,7 +163,7 @@ take a lot of space. Second, many programmers find them confusing to use.
 For example, here's a
 classic Java puzzler that catches most of us off guard, try your hand at it:
 ```java
-// Q: What will be the output when doIt() is executed, 4, 5, 6, or 42?
+// Q: What will be the output when doIt() is executed, 4, 5, 6, or 7?
 public class Wuuuut {
     public final int value = 4;
     public void doIt() {
@@ -154,7 +171,7 @@ public class Wuuuut {
         Runnable r = new Runnable() {
             public final int value = 5;
             public void run() {
-                int value = 10;
+                int value = 7;
                 System.out.println(this.value);
             }
         };
@@ -203,7 +220,7 @@ possible before Java 8!
 Lambda Expressions
 ==================
 
-A *lambda expression* can be understand as a concise representation of an anonymous function that
+A *lambda expression* can be understood as a concise representation of an anonymous function that
 can be passed around: it doesn't have a name, but it has a list of parameters, a body, a return
 type, and possibly a list of exceptions that can be thrown.
 
@@ -515,7 +532,7 @@ Q: What are equivalent method references for the following lambdas?
 2. BiPredicate<List<String>, String> contains = (list, element) -> list.contains(element);
 ```
 
-A:
+Answer:
 ```java
 1. Function<String, Integer> stringToInteger = Integer::parseInt;
 2. BiPredicate<List<String>, String> contains = List::contains;
@@ -863,14 +880,5 @@ default void sort(Comparator<? super E> c) {
 But wait, a single class can implement multiple interfaces, right? So does that mean that you can
 have multiple default implementations in several interfaces? The answer is Yes, to some extent.
 
-I'll talk about this later, there are some restrictions that prevent issues such as the
-infamous *diamond inheritance problem* in C++.
-
-Other good ideas from functional programming
-============================================
-
-In Java 8 there's an `Optional<T>` class that, if used consistently, can help you avoid
-`NullPointerExceptions`. It's a container object that may or may not contain a value. `Optional<T>`
-also includes methods to explicitly deal with the case where a value is absent. In other words, it
-uses the type system to allow you to indicate when a variable is anticipated to potentially have a
-missing value.
+I'll talk about this in the future (or you can look it up), there are some restrictions that prevent
+issues such as the infamous *diamond inheritance problem* in C++.
